@@ -91,6 +91,7 @@ abstract class AbstractTestFrameworkAdapter
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser
     ) {
+        // todo remove, path result instead
         $this->testFrameworkFinder = $testFrameworkFinder;
         $this->initialConfigBuilder = $initialConfigBuilder;
         $this->mutationConfigBuilder = $mutationConfigBuilder;
@@ -104,7 +105,6 @@ abstract class AbstractTestFrameworkAdapter
 
     /**
      * Returns array of arguments to pass them into the Initial Run Symfony Process
-     *
      *
      * @return string[]
      */
@@ -129,7 +129,7 @@ abstract class AbstractTestFrameworkAdapter
     /**
      * @return string[]
      */
-    public function getCommandLine(
+    private function getCommandLine(
         string $configPath,
         string $extraOptions,
         array $phpExtraArgs = []

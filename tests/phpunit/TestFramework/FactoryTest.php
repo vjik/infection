@@ -55,7 +55,8 @@ final class FactoryTest extends TestCase
             new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
             '',
             new InfectionConfig(new \stdClass(), new Filesystem(), ''),
-            $this->createMock(VersionParser::class)
+            $this->createMock(VersionParser::class),
+            $this->createMock(Filesystem::class)
         );
 
         $this->expectException(\InvalidArgumentException::class);
