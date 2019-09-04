@@ -128,7 +128,7 @@ final class Factory
             $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
 
             return new PhpUnitAdapter(
-                new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
+                (new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()))->find(),
                 new InitialConfigBuilder(
                     $this->tmpDir,
                     $phpUnitConfigContent,
@@ -147,7 +147,7 @@ final class Factory
             $phpSpecConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPSPEC);
 
             return new PhpSpecAdapter(
-                new TestFrameworkFinder(TestFrameworkTypes::PHPSPEC),
+                (new TestFrameworkFinder(TestFrameworkTypes::PHPSPEC))->find(),
                 new PhpSpecInitialConfigBuilder($this->tmpDir, $phpSpecConfigPath, $skipCoverage),
                 new PhpSpecMutationConfigBuilder($this->tmpDir, $phpSpecConfigPath, $this->projectDir),
                 new PhpSpecArgumentsAndOptionsBuilder(),
@@ -161,7 +161,7 @@ final class Factory
             $codeceptionConfigContentParsed = Yaml::parse($codeceptionConfigContent);
 
             return new CodeceptionAdapter(
-                new TestFrameworkFinder(CodeceptionAdapter::EXECUTABLE),
+                (new TestFrameworkFinder(CodeceptionAdapter::EXECUTABLE))->find(),
                 new CodeceptionInitialConfigBuilder(
                     $this->tmpDir,
                     $this->projectDir,
