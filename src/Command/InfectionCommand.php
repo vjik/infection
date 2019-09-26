@@ -55,6 +55,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
@@ -316,7 +317,7 @@ final class InfectionCommand extends BaseCommand
 
         $processBuilder = new MutantProcessBuilder($adapter, $config->getProcessTimeout());
 
-        $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey);
+        $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
         $mutationsGenerator = new MutationsGenerator(
             $config->getSourceDirs(),
             $config->getSourceExcludePaths(),
@@ -422,12 +423,11 @@ final class InfectionCommand extends BaseCommand
         }
     }
 
-    private function getCodeCoverageData(string $testFrameworkKey): LineCodeCoverage
+    private function getCodeCoverageData(string $testFrameworkKey, AbstractTestFrameworkAdapter $adapter): LineCodeCoverage
     {
         $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
-        $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);
-        $testFileDataProviderService = $this->container->offsetExists($testFileDataProviderServiceId)
-            ? $this->container[$testFileDataProviderServiceId]
+        $testFileDataProviderService = $adapter->hasJUnitReport()
+            ? $this->container[CachedTestFileDataProvider::class]
             : null;
 
         return new XMLLineCodeCoverage($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
