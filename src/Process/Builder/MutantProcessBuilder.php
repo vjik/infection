@@ -37,7 +37,7 @@ namespace Infection\Process\Builder;
 
 use Infection\Mutant\MutantInterface;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
 /**
@@ -46,7 +46,7 @@ use Symfony\Component\Process\Process;
 final class MutantProcessBuilder
 {
     /**
-     * @var AbstractTestFrameworkAdapter
+     * @var TestFrameworkAdapter
      */
     private $testFrameworkAdapter;
 
@@ -55,7 +55,7 @@ final class MutantProcessBuilder
      */
     private $timeout;
 
-    public function __construct(AbstractTestFrameworkAdapter $testFrameworkAdapter, int $timeout)
+    public function __construct(TestFrameworkAdapter $testFrameworkAdapter, int $timeout)
     {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
         $this->timeout = $timeout;
@@ -65,7 +65,7 @@ final class MutantProcessBuilder
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
-                $this->testFrameworkAdapter->buildMutationConfigFile($mutant),
+                $mutant,
                 $testFrameworkExtraOptions
             )
         );

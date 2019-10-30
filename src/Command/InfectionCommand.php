@@ -54,7 +54,6 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
@@ -63,6 +62,7 @@ use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -260,7 +260,7 @@ final class InfectionCommand extends BaseCommand
         $this->eventDispatcher = $this->container['dispatcher'];
     }
 
-    private function startUp(): AbstractTestFrameworkAdapter
+    private function startUp(): TestFrameworkAdapter
     {
         Assert::notNull($this->container);
 
@@ -286,7 +286,7 @@ final class InfectionCommand extends BaseCommand
         return $adapter;
     }
 
-    private function runInitialTestSuite(AbstractTestFrameworkAdapter $adapter): void
+    private function runInitialTestSuite(TestFrameworkAdapter $adapter): void
     {
         /** @var InfectionConfig $config */
         $config = $this->container['infection.config'];
@@ -310,7 +310,7 @@ final class InfectionCommand extends BaseCommand
         $this->container['memory.limit.applier']->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
     }
 
-    private function runMutationTesting(AbstractTestFrameworkAdapter $adapter): void
+    private function runMutationTesting(TestFrameworkAdapter $adapter): void
     {
         /** @var InfectionConfig $config */
         $config = $this->container['infection.config'];
@@ -423,7 +423,7 @@ final class InfectionCommand extends BaseCommand
         }
     }
 
-    private function getCodeCoverageData(string $testFrameworkKey, AbstractTestFrameworkAdapter $adapter): LineCodeCoverage
+    private function getCodeCoverageData(string $testFrameworkKey, TestFrameworkAdapter $adapter): LineCodeCoverage
     {
         $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
         $testFileDataProviderService = $adapter->hasJUnitReport()

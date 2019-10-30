@@ -33,76 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Codeception\Config\Builder;
+namespace Infection\TestFramework;
 
-use Infection\TestFramework\Codeception\Config\InitialYamlConfiguration;
-use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
-use Symfony\Component\Filesystem\Filesystem;
+use Infection\Mutant\MutantInterface;
 
 /**
  * @internal
  */
-final class InitialConfigBuilder implements ConfigBuilder
+interface TestFrameworkAdapter
 {
-    /**
-     * @var string
-     */
-    private $tmpDir;
+    public const JUNIT_FILE_NAME = 'junit.xml';
+
+    public function getName(): string;
+
+    public function testsPass(string $output): bool;
+
+    public function hasJUnitReport(): bool;
 
     /**
-     * @var string
+     * @param string[] $phpExtraArgs
+     *
+     * @return string[]
      */
-    private $projectDir;
+    public function getInitialTestRunCommandLine(string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array;
 
     /**
-     * @var array
+     * @return string[]
      */
-    private $originalConfigContentParsed;
+    public function getMutantCommandLine(MutantInterface $mutant, string $extraOptions): array;
 
-    /**
-     * @var bool
-     */
-    private $skipCoverage;
+    public function getVersion(): string;
 
-    /**
-     * @var string[]
-     */
-    private $srcDirs;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
-
-    /**
-     * @param array<string, mixed> $originalConfigContentParsed
-     * @param array<int, string> $srcDirs
-     */
-    public function __construct(Filesystem $filesystem, string $tmpDir, string $projectDir, array $originalConfigContentParsed, bool $skipCoverage, array $srcDirs)
-    {
-        $this->filesystem = $filesystem;
-        $this->tmpDir = $tmpDir;
-        $this->projectDir = $projectDir;
-        $this->originalConfigContentParsed = $originalConfigContentParsed;
-        $this->srcDirs = $srcDirs;
-        $this->skipCoverage = $skipCoverage;
-    }
-
-    public function build(string $version): string
-    {
-        $path = $this->tmpDir . '/codeception.initial.infection.yml';
-
-        $yamlConfiguration = new InitialYamlConfiguration(
-            $this->tmpDir,
-            $this->projectDir,
-            $this->originalConfigContentParsed,
-            $this->skipCoverage,
-            $this->srcDirs,
-            $this->filesystem
-        );
-
-        file_put_contents($path, $yamlConfiguration->getYaml());
-
-        return $path;
-    }
+    public function getInitialTestsFailRecommendations(string $commandLine): string;
 }

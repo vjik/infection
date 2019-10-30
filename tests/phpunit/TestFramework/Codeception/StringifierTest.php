@@ -33,28 +33,63 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Codeception\CommandLine;
+namespace Infection\Tests\TestFramework\Codeception;
 
-use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
+use Infection\TestFramework\Codeception\Stringifier;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
+final class StringifierTest extends TestCase
 {
-    public function build(string $configPath, string $extraOptions): array
+    /**
+     * @var Stringifier
+     */
+    private $stringifier;
+
+    protected function setUp(): void
     {
-        return array_filter(
-            array_merge(
-                [
-                    'run',
-                    '--no-colors',
-                    '--fail-fast',
-                    '--config',
-                    $configPath,
-                ],
-                explode(' ', $extraOptions)
-            )
-        );
+        parent::setUp();
+
+        $this->stringifier = new Stringifier();
+    }
+
+    /**
+     * @dataProvider provideBooleanStrings
+     */
+    public function test_stringify_boolean(bool $boolean, string $expectedStringBoolean): void
+    {
+        $this->assertSame($expectedStringBoolean, $this->stringifier->stringifyBoolean($boolean));
+    }
+
+    /**
+     * @dataProvider provideArrayOfStrings
+     */
+    public function test_stringify_array_of_strings(array $arrayOfStrings, string $expectedStringArray): void
+    {
+        $this->assertSame($expectedStringArray, $this->stringifier->stringifyArray($arrayOfStrings));
+    }
+
+    public function test_stringify_array_of_strings_works_only_with_array_of_strings(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $arrayOfInts = [1, 2, 3];
+
+        $this->stringifier->stringifyArray($arrayOfInts);
+    }
+
+    public function provideBooleanStrings(): \Generator
+    {
+        yield 'True' => [true, 'true'];
+
+        yield 'False' => [false, 'false'];
+    }
+
+    public function provideArrayOfStrings(): \Generator
+    {
+        yield 'Empty array' => [[], '[]'];
+
+        yield 'One element' => [['/path/to/first'], '[/path/to/first]'];
+
+        yield 'Several elements' => [['/path/to/first', '/second'], '[/path/to/first,/second]'];
     }
 }

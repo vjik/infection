@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Builder;
 
 use Infection\Console\Util\PhpProcess;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
 /**
@@ -45,11 +45,11 @@ use Symfony\Component\Process\Process;
 class InitialTestRunProcessBuilder
 {
     /**
-     * @var AbstractTestFrameworkAdapter
+     * @var TestFrameworkAdapter
      */
     private $testFrameworkAdapter;
 
-    public function __construct(AbstractTestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
     {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
@@ -68,7 +68,6 @@ class InitialTestRunProcessBuilder
         /** @var PhpProcess|Process $process */
         $process = new $processType(
             $this->testFrameworkAdapter->getInitialTestRunCommandLine(
-                $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
                 $phpExtraOptions,
                 $skipCoverage

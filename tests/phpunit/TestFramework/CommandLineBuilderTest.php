@@ -33,58 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Codeception\Config\Builder;
+namespace Infection\Tests\TestFramework;
 
-use Infection\TestFramework\Codeception\Config\Builder\InitialConfigBuilder;
-use Infection\Utils\TmpDirectoryCreator;
+use Infection\TestFramework\CommandLineBuilder;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Yaml\Yaml;
 
-final class InitialConfigBuilderTest extends TestCase
+final class CommandLineBuilderTest extends TestCase
 {
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
+    private const PHP_EXTRA_ARGS = ['-d zend_extension=xdebug.so'];
+
+    private const TEST_FRAMEWORK_ARGS = ['--filter XYZ', '--exclude-group=e2e'];
 
     /**
-     * @var string
+     * @var CommandLineBuilder
      */
-    private $tmpDir;
-
-    /**
-     * @var string
-     */
-    private $workspace;
+    private $commandLineBuilder;
 
     protected function setUp(): void
     {
-        $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
-        $this->fileSystem = new Filesystem();
+        parent::setUp();
 
-        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
+        $this->commandLineBuilder = new CommandLineBuilder();
     }
 
-    protected function tearDown(): void
+    public function test_it_builds_command_line_for_batch_file(): void
     {
-        $this->fileSystem->remove($this->workspace);
-    }
+        $commandLine = $this->commandLineBuilder->build('phpunit.bat', self::PHP_EXTRA_ARGS, self::TEST_FRAMEWORK_ARGS);
 
-    public function test_it_builds_path_to_initial_config_file(): void
-    {
-        $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/codeception/codeception.yml';
-
-        $builder = new InitialConfigBuilder(
-            $this->fileSystem,
-            $this->tmpDir,
-            \dirname($originalYamlConfigPath),
-            Yaml::parseFile($originalYamlConfigPath),
-            false,
-            ['src']
+        $this->assertSame(
+            [
+                'phpunit.bat',
+                '--filter XYZ',
+                '--exclude-group=e2e',
+            ],
+            $commandLine
         );
+    }
 
-        $this->assertSame($this->tmpDir . '/codeception.initial.infection.yml', $builder->build('2.0'));
-        $this->assertFileExists($this->tmpDir . '/codeception.initial.infection.yml');
+    public function test_it_builds_command_line_with_empty_php_args(): void
+    {
+        $commandLine = $this->commandLineBuilder->build('vendor/bin/phpunit', [], self::TEST_FRAMEWORK_ARGS);
+
+        $this->assertSame(
+            [
+                'vendor/bin/phpunit',
+                '--filter XYZ',
+                '--exclude-group=e2e',
+            ],
+            $commandLine
+        );
     }
 }

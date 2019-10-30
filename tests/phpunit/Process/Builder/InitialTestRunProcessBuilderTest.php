@@ -46,8 +46,6 @@ final class InitialTestRunProcessBuilderTest extends TestCase
         $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $fwAdapter->method('getInitialTestRunCommandLine')
             ->willReturn(['/usr/bin/php']);
-        $fwAdapter->method('buildInitialConfigFile')
-            ->willReturn('buildInitialConfigFile');
 
         $builder = new InitialTestRunProcessBuilder($fwAdapter);
 

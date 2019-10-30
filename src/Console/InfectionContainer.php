@@ -54,7 +54,7 @@ use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
@@ -63,6 +63,7 @@ use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\Utils\TmpDirectoryCreator;
 use Infection\Utils\VersionParser;
 use PhpParser\Lexer;
@@ -113,7 +114,7 @@ final class InfectionContainer extends Container
                 return sprintf(
                     '%s/%s',
                     $container['coverage.path'],
-                    AbstractTestFrameworkAdapter::JUNIT_FILE_NAME
+                    TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
@@ -137,7 +138,8 @@ final class InfectionContainer extends Container
                     $container['junit.file.path'],
                     $container['infection.config'],
                     $container['version.parser'],
-                    $container['filesystem']
+                    $container['filesystem'],
+                    $container[CommandLineBuilder::class]
                 );
             },
             'xml.configuration.helper' => static function (self $container): XmlConfigurationHelper {
@@ -212,6 +214,9 @@ final class InfectionContainer extends Container
             },
             'memory.limit.applier' => static function (self $container): MemoryLimiter {
                 return new MemoryLimiter($container['filesystem'], \php_ini_loaded_file());
+            },
+            CommandLineBuilder::class => static function (): CommandLineBuilder {
+                return new CommandLineBuilder();
             },
         ]);
     }
