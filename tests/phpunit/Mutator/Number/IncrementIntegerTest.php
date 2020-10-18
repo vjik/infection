@@ -128,5 +128,12 @@ if ($foo === -11) {
 PHP
             ,
         ];
+
+        yield 'It does not increment limit argument of preg_split function when it equals to -1' => [
+            <<<'PHP'
+<?php
+preg_split('//', 'string', -1);
+PHP
+        ];
     }
 }

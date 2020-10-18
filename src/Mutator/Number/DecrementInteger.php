@@ -91,6 +91,10 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
+        if ($this->isPregSplitArgument($node)) {
+            return false;
+        }
+
         return $this->isAllowedComparison($node);
     }
 
@@ -154,6 +158,28 @@ final class DecrementInteger extends AbstractNumberMutator
         }
 
         if (ParentConnector::getParent($node) instanceof Node\Expr\ArrayDimFetch) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function isPregSplitArgument(Node $node): bool
+    {
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Arg) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::getParent($parentNode);
+
+        if (
+            $node->value === 0 &&
+            $parentNode instanceof Node\Expr\FuncCall &&
+            $parentNode->name instanceof Node\Name &&
+            $parentNode->name->toLowerString() === 'preg_split'
+        ) {
             return true;
         }
 
