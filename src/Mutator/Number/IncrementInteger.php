@@ -100,6 +100,7 @@ final class IncrementInteger extends AbstractNumberMutator
 
         $parentNode = ParentConnector::getParent($parentNode);
 
+        /** @var Node\Scalar\LNumber $node */
         if (
             $node->value === 1 &&
             $parentNode instanceof Node\Expr\FuncCall &&

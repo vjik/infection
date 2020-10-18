@@ -174,6 +174,7 @@ final class DecrementInteger extends AbstractNumberMutator
 
         $parentNode = ParentConnector::getParent($parentNode);
 
+        /** @var Node\Scalar\LNumber $node */
         if (
             $node->value === 0 &&
             $parentNode instanceof Node\Expr\FuncCall &&
